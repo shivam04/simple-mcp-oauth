@@ -88,6 +88,8 @@ oauthRouter.post("/oauth/register", (req, res) => {
       token_endpoint_auth_method,
     } = req.body;
 
+    console.log(`oauth register`, JSON.stringify(req.body))
+
     if (!client_name) {
       return res.status(400).json({
         error: "invalid_client_metadata",
@@ -141,6 +143,8 @@ oauthRouter.get("/oauth/authorize", (req, res) => {
     code_challenge,
     code_challenge_method,
   } = req.query as Record<string, string>;
+
+  console.log(`oauth authorize`, JSON.stringify(req.query))
 
   req.session.oauth = {
       client_id,
@@ -225,7 +229,12 @@ oauthRouter.post(
     "/oauth/token",
     async (req, res) => {
 
+      console.log(`oauth authorize`, JSON.stringify(req.body))
+      console.log(`oauth authorize`, JSON.stringify(req.headers))
+
       const client = authenticateClient(req);
+
+      console.log(`oauth authorize`, JSON.stringify(client))
 
       if (!client) {
         return res.status(401)
@@ -448,6 +457,8 @@ oauthRouter.get("/oauth/login", (req, res) => {
     (req.query.next as string) ?? "/"
   );
 
+  console.log(`oauth login`, JSON.stringify(req.query))
+
   res.send(`
     <html>
     <body>
@@ -479,6 +490,8 @@ oauthRouter.post("/login", (req, res) => {
     username,
     password,
   } = req.body;
+
+  console.log(`oauth /login`, JSON.stringify(req.body))
 
   const user =
     Array.from(users.values())
@@ -524,6 +537,7 @@ oauthRouter.post("/login", (req, res) => {
 
 oauthRouter.get("/oauth/consent", (req, res) => {
 
+  console.log(`oauth consent`, JSON.stringify(req.query))
   res.send(`
     <html>
       <body>
@@ -569,6 +583,8 @@ oauthRouter.get("/oauth/consent", (req, res) => {
 });
 
 oauthRouter.post("/oauth/consent", async (req, res) => {
+
+  console.log(`oauth post consent`, JSON.stringify(req.body))
   if (!req.session.userId) {
     return res.redirect("/oauth/login");
   }
@@ -654,6 +670,8 @@ oauthRouter.post("/oauth/consent", async (req, res) => {
 
 oauthRouter.post("/oauth/revoke", (req, res) => {
   const { token, token_type_hint } = req.body;
+
+  console.log(`oauth revoke`, JSON.stringify(req.body))
 
   if (!token) {
     return res.status(400).json({
