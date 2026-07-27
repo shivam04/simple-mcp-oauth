@@ -229,12 +229,12 @@ oauthRouter.post(
     "/oauth/token",
     async (req, res) => {
 
-      console.log(`oauth authorize`, JSON.stringify(req.body))
-      console.log(`oauth authorize`, JSON.stringify(req.headers))
+      console.log(`oauth token`, JSON.stringify(req.body))
+      console.log(`oauth token`, JSON.stringify(req.headers))
 
       const client = authenticateClient(req);
 
-      console.log(`oauth authorize`, JSON.stringify(client))
+      console.log(`oauth token`, JSON.stringify(client))
 
       if (!client) {
         return res.status(401)
