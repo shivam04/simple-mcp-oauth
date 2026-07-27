@@ -37,7 +37,8 @@ async function main() {
       
       let transport: StreamableHTTPServerTransport;
 
-      console.log(`AuthenticatedRequest: ${JSON.stringify(req)}`);
+      console.log(`AuthenticatedRequest: ${JSON.stringify(req.body)}`);
+      console.log(`AuthenticatedRequest: ${JSON.stringify(req.headers)}`);
 
       console.log(`Logged In User: ${req.user?.username}`)
 
