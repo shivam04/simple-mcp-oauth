@@ -54,7 +54,7 @@ export async function issueAccessToken(
     .setAudience(clientId)
     .setSubject(userId)
     .setIssuedAt()
-    .setExpirationTime(Math.floor(Date.now() / 1000) + 300)
+    .setExpirationTime("1h")
     .sign(privateKey);
 }
 
