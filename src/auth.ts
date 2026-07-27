@@ -12,6 +12,8 @@ export async function requireBearer(
 ) {
   const auth = req.header("Authorization");
 
+  console.log(`process env RESOURCE_METADATA ${RESOURCE_METADATA}`)
+
   //
   // No Authorization header
   //

@@ -19,6 +19,8 @@ async function main() {
 
   const app = express();
 
+  console.log(`process env ${process.env.NODE_ENV}`)
+
   if (process.env.NODE_ENV === "production") {
     // Required so express-session sees requests as secure when behind a
     // reverse proxy/load balancer that terminates TLS (X-Forwarded-Proto).

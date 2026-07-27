@@ -45,6 +45,7 @@ export async function issueAccessToken(
   clientId: string,
   scope: string
 ) {
+  console.log(`process env ISSUER ${ISSUER}`)
   return await new SignJWT({ scope })
     .setProtectedHeader({
       alg: "RS256",
