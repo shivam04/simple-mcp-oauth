@@ -29,12 +29,6 @@ async function main() {
   app.all("/mcp", requireBearer, async (req, res) => {
     try {
       const sessionId = req.header("mcp-session-id");
-
-      console.log(
-          "Authenticated:",
-          req.user?.username
-      );
-
       let transport: StreamableHTTPServerTransport;
 
       if (sessionId && sessions.has(sessionId)) {
