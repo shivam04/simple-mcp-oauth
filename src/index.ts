@@ -17,6 +17,14 @@ async function main() {
   await initializeJwt();
 
   const app = express();
+
+  if (process.env.NODE_ENV === "production") {
+    // Required so express-session sees requests as secure when behind a
+    // reverse proxy/load balancer that terminates TLS (X-Forwarded-Proto).
+    // Without this, req.secure is false and the Secure cookie never gets set.
+    app.set("trust proxy", 1);
+  }
+
   app.use(
     cors()
   );
