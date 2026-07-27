@@ -1,5 +1,6 @@
 import express from "express";
 import { randomUUID } from "crypto";
+import cors from "cors";
 
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 
@@ -9,12 +10,16 @@ import { oauthRouter } from "./oauth.js";
 import { requireBearer } from "./auth.js";
 import { initializeJwt } from "./jwt.js";
 import { sessionMiddleware } from "./session.js";
+import { AuthenticatedRequest } from "./types.js";
 
 async function main() {
 
   await initializeJwt();
 
   const app = express();
+  app.use(
+    cors()
+  );
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -26,16 +31,18 @@ async function main() {
 
 
 
-  app.all("/mcp", requireBearer, async (req, res) => {
+  app.all("/mcp", requireBearer, async (req: AuthenticatedRequest, res) => {
     try {
       const sessionId = req.header("mcp-session-id");
       
       let transport: StreamableHTTPServerTransport;
 
+      console.log(`Logged In User: ${req.user?.username}`)
+
       if (sessionId && sessions.has(sessionId)) {
         transport = sessions.get(sessionId)!.transport;
       } else {
-        const server = createMcpServer();
+        const server = createMcpServer(req.user);
 
         transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => randomUUID(),

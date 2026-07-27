@@ -3,7 +3,7 @@ import { AuthenticatedRequest } from "./types.js";
 import { users } from "./storage.js";
 import { verifyAccessToken } from "./jwt.js";
 
-const RESOURCE_METADATA = `${process.env.ISSUER ?? "http://localhost:3000"}/.well-known/oauth-protected-resource`
+const RESOURCE_METADATA = `${process.env.ISSUER ?? "http://localhost:3000"}/.well-known/oauth-protected-resource/mcp`
 
 export async function requireBearer(
   req: AuthenticatedRequest,

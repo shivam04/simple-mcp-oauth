@@ -22,7 +22,7 @@ export const oauthRouter = Router();
  * RFC 9728 OAuth Protected Resource Metadata
  */
 oauthRouter.get(
-  "/.well-known/oauth-protected-resource",
+  "/.well-known/oauth-protected-resource/mcp",
   (req, res) => {
     const issuer = process.env.ISSUER ?? "http://localhost:3000";
     res.json({
