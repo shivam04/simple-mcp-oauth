@@ -24,8 +24,7 @@ export const oauthRouter = Router();
 oauthRouter.get(
   "/.well-known/oauth-protected-resource",
   (req, res) => {
-    const issuer =
-      "http://localhost:3000";
+    const issuer = process.env.ISSUER ?? "http://localhost:3000";
     res.json({
       resource:
         `${issuer}/mcp`,
@@ -42,7 +41,7 @@ oauthRouter.get(
 oauthRouter.get(
   "/.well-known/oauth-authorization-server",
   (req, res) => {
-    const issuer = "http://localhost:3000";
+    const issuer = process.env.ISSUER ?? "http://localhost:3000";
     res.json({
       issuer,
       authorization_endpoint:

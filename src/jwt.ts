@@ -9,7 +9,7 @@ import {
 } from "jose";
 import path from "path";
 
-const ISSUER = "http://localhost:3000";
+const ISSUER = process.env.ISSUER ?? "http://localhost:3000";
 const KEY_ID = "simple-mcp-key-1";
 
 // jose v6 returns CryptoKey
