@@ -142,6 +142,15 @@ oauthRouter.get("/oauth/authorize", (req, res) => {
     code_challenge_method,
   } = req.query as Record<string, string>;
 
+  req.session.oauth = {
+      client_id,
+      redirect_uri,
+      response_type,
+      code_challenge,
+      scope,
+      state
+  };
+
   //
   // Validate request
   //
@@ -155,30 +164,6 @@ oauthRouter.get("/oauth/authorize", (req, res) => {
   if (!client_id) {
     return res.status(400).json({
       error: "invalid_client",
-    });
-  }
-
-  const client = oauthClients.get(client_id);
-
-  if (!client) {
-    return res.status(400).json({
-      error: "invalid_client",
-    });
-  }
-
-  if (!redirect_uri) {
-    return res.status(400).json({
-      error: "invalid_request",
-    });
-  }
-
-  if (
-    !client.redirect_uris.includes(
-      redirect_uri
-    )
-  ) {
-    return res.status(400).json({
-      error: "invalid_redirect_uri",
     });
   }
 
@@ -223,56 +208,16 @@ oauthRouter.get("/oauth/authorize", (req, res) => {
 
   if (!user) {
     req.session.destroy(() => {});
+    const next =
+      encodeURIComponent(
+        req.originalUrl
+      );
     return res.redirect(
-      `/oauth/login`
+      `/oauth/login?next=${next}`
     );
-  }
-
-  //
-  // Generate Code
-  //
-
-  const code = createAuthorizationCode()
-
-  saveAuthorizationCode({
-    code,
-    clientId: client.client_id,
-    userId: user.id,
-    redirectUri: redirect_uri,
-    scope: scope ?? "mcp",
-    codeChallenge: code_challenge,
-    codeChallengeMethod: "S256",
-    expiresAt:
-      Date.now() + 5 * 60 * 1000,
-  });
-
-  console.log(
-    "Authorization Code:",
-    code
-  );
-
-  //
-  // Redirect
-  //
-
-  const redirect = new URL(
-    redirect_uri
-  );
-
-  redirect.searchParams.set(
-    "code",
-    code
-  );
-
-  if (state) {
-    redirect.searchParams.set(
-      "state",
-      state
-    );
-  }
-
+  } 
   return res.redirect(
-    redirect.toString()
+    `/oauth/consent?client_id=${client_id}&scope=${scope}`
   );
 });
 
@@ -622,6 +567,90 @@ oauthRouter.get("/oauth/consent", (req, res) => {
     </html>
     `);
 });
+
+oauthRouter.post("/oauth/consent", async (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect("/oauth/login");
+  }
+
+  const {client_id, action} = req.body
+
+  const oauth = req.session.oauth;
+
+  if (!oauth) {
+    return res.status(400)
+        .send("Invalid OAuth request");
+  }
+
+  if (action === "deny") {
+    const redirect = new URL(
+      oauth.redirect_uri as string
+    );
+    redirect.searchParams.set(
+      "status",
+      "deny"
+    )
+    return res.redirect(
+      redirect.toString()
+    )
+  }
+
+  if (oauth.client_id != client_id) {
+    return res.status(400)
+        .send("Invalid clientId");
+  }
+  //
+  // Generate Code
+  //
+
+  const code = createAuthorizationCode()
+
+  saveAuthorizationCode({
+    code,
+    clientId: oauth.client_id as string,
+    userId: req.session.userId,
+    redirectUri: oauth.redirect_uri as string,
+    scope: oauth.scope ?? "mcp" as string,
+    codeChallenge: oauth.code_challenge as string,
+    codeChallengeMethod: "S256",
+    expiresAt:
+      Date.now() + 5 * 60 * 1000,
+  });
+
+  console.log(
+    "Authorization Code:",
+    code
+  );
+
+  //
+  // Redirect
+  //
+
+  const redirect = new URL(
+    oauth.redirect_uri as string
+  );
+
+  redirect.searchParams.set(
+    "code",
+    code
+  );
+
+  if (oauth.state) {
+    redirect.searchParams.set(
+      "state",
+      oauth.state as string
+    );
+  }
+
+  redirect.searchParams.set(
+    "status",
+    "approve"
+  );
+
+  return res.redirect(
+    redirect.toString()
+  );
+})
 
 oauthRouter.post("/oauth/revoke", (req, res) => {
   const { token, token_type_hint } = req.body;
