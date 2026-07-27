@@ -37,6 +37,8 @@ async function main() {
       
       let transport: StreamableHTTPServerTransport;
 
+      console.log(`AuthenticatedRequest: ${JSON.stringify(req)}`);
+
       console.log(`Logged In User: ${req.user?.username}`)
 
       if (sessionId && sessions.has(sessionId)) {
