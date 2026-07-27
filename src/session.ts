@@ -1,5 +1,7 @@
 import session from "express-session";
 
+console.log(`process env session secret: ${process.env.SESSION_SECRET}`);
+
 export const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET!,
   resave: false,
