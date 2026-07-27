@@ -282,6 +282,8 @@ async function exchangeAuthorizationCode(req: any, res: any) {
   const authCode =
       getAuthorizationCode(code);
 
+  console.log(`exchangeAuthorizationCode: ${JSON.stringify(authCode)}`);
+
   if (!authCode) {
       return res.status(400).json({
           error: "invalid_grant",
@@ -362,6 +364,8 @@ async function exchangeAuthorizationCode(req: any, res: any) {
       revoked: false
   });
 
+  console.log(`exchangeAuthorizationCode res: ${accessToken} ${refreshToken}`);
+
   return res.json({
       token_type: "Bearer",
       access_token: accessToken,
@@ -385,6 +389,7 @@ async function exchangeRefreshToken(req: any, res: any) {
   }
 
   const stored = getRefreshToken(refresh_token);
+  console.log(`exchangeRefreshToken stored refreshtoken: ${JSON.stringify(stored)}`);
 
   if (!stored) {
     return res.status(400).json({
@@ -417,6 +422,8 @@ async function exchangeRefreshToken(req: any, res: any) {
 
   stored.revoked = true;
 
+  console.log(`exchangeRefreshToken stored: ${JSON.stringify(stored)}`);
+
   const newAccessToken = await issueAccessToken(
     stored.userId,
     stored.clientId,
@@ -433,6 +440,8 @@ async function exchangeRefreshToken(req: any, res: any) {
     expiresAt: Date.now() + 30 * 24 * 3600 * 1000,
     revoked: false
   });
+
+  console.log(`exchangeRefreshToken res: ${newAccessToken} ${newRefreshToken}`);
 
   return res.json({
     token_type: "Bearer",
