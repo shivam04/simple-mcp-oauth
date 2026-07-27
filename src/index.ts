@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import { randomUUID } from "crypto";
 import cors from "cors";
