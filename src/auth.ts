@@ -31,10 +31,14 @@ export async function requireBearer(
   }
 
   const token = auth.substring(7);
+  console.log(`mcp token ${token}`)
   try {
     const { payload } = await verifyAccessToken(token);
+    console.log(`mcp token ${JSON.stringify(payload)}`)
 
     const user = users.get(payload.sub as string);
+
+    console.log(`mcp token ${JSON.stringify(user)}`)
 
     if (!user) {
       return res.sendStatus(401);
